@@ -1,6 +1,6 @@
 import { expect, it, describe } from '@jest/globals'
 import { mount } from '@vue/test-utils'
-import Vue3ChartJs from '../lib/main'
+import Vue3ChartJs from '../lib/main.ts'
 import { Chart } from 'chart.js'
 
 import { createApp } from 'vue'
@@ -48,6 +48,15 @@ describe('init', () => {
     const wrapper = factory(doughnutProps)
     expect(wrapper.props().plugins).toEqual([])
   })
+
+  it('returns empty canvas element', () => {
+    const doughnutProps = getDoughnutProps()
+    delete doughnutProps.plugins
+    const wrapper = factory(doughnutProps)
+    wrapper.vm.destroy()
+    wrapper.vm.render()
+    expect(wrapper.vm.chartJSState.chart).toBeTruthy()
+  })
 })
 
 describe('chart reloading', () => {
@@ -58,6 +67,15 @@ describe('chart reloading', () => {
     wrapper.vm.render()
     expect(wrapper.emitted('afterUpdate')).toHaveLength(2)
     expect(wrapper.emitted('afterInit')).toHaveLength(1)
+  })
+
+  it('does not reload if chart does not exist', () => {
+    const wrapper = factory(getDoughnutProps())
+    wrapper.vm.render()
+    expect(wrapper.emitted('afterUpdate')).toHaveLength(1)
+    wrapper.vm.destroy()
+    wrapper.vm.update()
+    expect(wrapper.emitted('afterUpdate')).toHaveLength(1)
   })
 })
 

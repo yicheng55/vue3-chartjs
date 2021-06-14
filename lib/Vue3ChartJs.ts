@@ -1,6 +1,4 @@
-<script>
-import { h, ref, onMounted, defineComponent } from 'vue'
-import { chartJsEventNames, generateEventObject, generateChartJsEventListener } from './includes'
+import {h, ref, onMounted, defineComponent} from 'vue'
 import {
   Chart,
   ArcElement,
@@ -25,8 +23,11 @@ import {
   Filler,
   Legend,
   Title,
-  Tooltip
+  Tooltip,
+  UpdateMode
 } from 'chart.js'
+import {chartJsEventNames, generateEventObject, generateChartJsEventListener} from './includes'
+import {ChartJSState, DataProp, OptionsProp, PluginsProp, TypeProp} from "./types";
 
 Chart.register(
     ArcElement,
@@ -58,53 +59,59 @@ const Vue3ChartJs = defineComponent({
   name: 'Vue3ChartJs',
   props: {
     type: {
-      type: String,
+      type: String as TypeProp,
       required: true
     },
     data: {
-      type: Object,
+      type: Object as DataProp,
       required: true
     },
     options: {
-      type: Object,
+      type: Object as OptionsProp,
       default: () => ({})
     },
     plugins: {
-      type: Array,
+      type: Array as PluginsProp,
       default: () => []
     }
   },
   emits: chartJsEventNames,
-  setup (props, { emit }) {
-    const chartRef = ref(null)
+  setup(props, {emit}) {
+    const chartRef = ref<HTMLCanvasElement | null>(null)
 
     //generate chart.js plugin to emit lib events
     const chartJsEventsPlugin = chartJsEventNames
         .reduce((reduced, eventType) => {
-          const event = generateEventObject(eventType, chartRef)
-          return { ...reduced, ...generateChartJsEventListener(emit, event) }
-        }, { id: 'Vue3ChartJsEventHookPlugin' })
+          const event = generateEventObject(eventType)
+          return {
+            ...reduced,
+            ...generateChartJsEventListener(emit, event)
+          }
+        }, {id: 'Vue3ChartJsEventHookPlugin'})
 
-    const chartJSState = {
+    const chartJSState: ChartJSState = {
       chart: null,
       plugins: [
         chartJsEventsPlugin,
         ...props.plugins
       ],
-      props: { ...props }
+      props: {...props}
     }
 
     const destroy = () => {
       if (chartJSState.chart) {
         chartJSState.chart.destroy()
         chartJSState.chart = null
+        chartRef.value = null
       }
     }
 
-    const update = (animateSpeed = 750) => {
-      chartJSState.chart.data = { ...chartJSState.chart.data, ...chartJSState.props.data }
-      chartJSState.chart.options = { ...chartJSState.chart.options, ...chartJSState.props.options }
-      chartJSState.chart.update(animateSpeed)
+    const update = (mode?: UpdateMode) => {
+      if (chartJSState.chart) {
+        chartJSState.chart.data = {...chartJSState.chart.data, ...chartJSState.props.data}
+        chartJSState.chart.options = {...chartJSState.chart.options, ...chartJSState.props.options}
+        chartJSState.chart.update(mode)
+      }
     }
 
     const resize = () => chartJSState.chart && chartJSState.chart.resize()
@@ -115,7 +122,8 @@ const Vue3ChartJs = defineComponent({
       }
 
       return chartJSState.chart = new Chart(
-          chartRef.value.getContext('2d'), {
+          chartRef.value?.getContext('2d') ?? document.createElement("canvas"),
+          {
             type: chartJSState.props.type,
             data: chartJSState.props.data,
             options: chartJSState.props.options,
@@ -136,7 +144,7 @@ const Vue3ChartJs = defineComponent({
     }
   },
 
-  render () {
+  render() {
     return h('canvas', {
       ref: 'chartRef'
     })
@@ -144,5 +152,3 @@ const Vue3ChartJs = defineComponent({
 })
 
 export default Vue3ChartJs
-
-</script>

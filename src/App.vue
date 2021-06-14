@@ -2,21 +2,22 @@
   <div style="height:600px;width: 600px;">
 
     <div style="width: 500px">
-      <vue3-chart-js v-bind="{...barChart}"  @after-update="afterUpdate"/>
+      <vue3-chart-js :type="barChart.type"  :data="barChart.data" :options="barChart.options" @after-update="afterUpdate"/>
     </div>
-    <div style="width: 500px">
-      <vue3-chart-js ref="chartRef" v-bind="{...localDoughnutChartOptions}" @after-update="afterUpdate"/>
-    </div>
+<!--    <div style="width: 500px">-->
+<!--      <vue3-chart-js ref="chartRef" :type="localDoughnutChartOptions.type"  :data="localDoughnutChartOptions.data" :options="localDoughnutChartOptions.options" @after-update="afterUpdate"/>-->
+<!--    </div>-->
     <button type="submit" @click="updateChart">Update Doughnut Data</button>
     <button type="submit" @click="exportChart">Export Chart as PNG</button>
-
   </div>
 </template>
 
-<script>
+<script type="ts">
 
 import { ref } from 'vue'
 import Vue3ChartJs from '../lib/main'
+
+import ChartOptionsType from "../lib/types";
 
 export default {
   name: 'App',
@@ -24,7 +25,7 @@ export default {
     Vue3ChartJs
   },
   setup () {
-    const barChart = {
+    const barChart: ChartOptionsType = {
       type: 'line',
       data: {
         labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
@@ -36,16 +37,6 @@ export default {
           tension: 0.1
         }]
       },
-      options: {
-        plugins: {
-          zoom: {
-            zoom: {
-              enabled: true,
-              mode: 'xy',
-            }
-          }
-        }
-      }
     }
 
     const doughnutChart = {

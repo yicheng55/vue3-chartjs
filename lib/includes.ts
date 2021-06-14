@@ -1,3 +1,5 @@
+import {ChartJSEventHandler, Emit} from "./types";
+
 const chartJsEventNames = [
   "install",
   "start",
@@ -22,29 +24,21 @@ const chartJsEventNames = [
   'uninstall',
   'afterTooltipDraw',
   'beforeTooltipDraw',
-]
+];
 
-function generateEventObject(type , chartRef = null) {
+function generateEventObject(type: string): Event {
   //chart js allows some events to be cancelled if they return false
-  //this implements familiar logic to allow vue emitted chart events to be canceled
-  return {
-    type: type,
-    chartRef: chartRef,
-    preventDefault () {
-      this._defaultPrevented = true
-    },
-    isDefaultPrevented () {
-      return !this._defaultPrevented
-    },
-    _defaultPrevented: false,
-  }
+  return new Event(type, {
+    bubbles: false,
+    cancelable: true,
+  });
 }
 
-function generateChartJsEventListener(emit, event) {
+function generateChartJsEventListener(emit: Emit, event: Event): Record<string, ChartJSEventHandler> {
   return {
-    [event.type]: () => {
+    [event.type]: (): boolean => {
       emit(event.type, event)
-      return event.isDefaultPrevented()
+      return !event.defaultPrevented
     }
   }
 }

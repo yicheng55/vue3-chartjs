@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [vue()],
   build: {
     lib: {
-      entry: path.resolve(__dirname, 'lib/main.js'),
+      entry: path.resolve(__dirname, 'lib/main.ts'),
       name: 'Vue3ChartJs'
     },
     rollupOptions: {

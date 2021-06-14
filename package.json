@@ -28,7 +28,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "eslint lib/** && jest --coverage && vite build",
+    "build": "vue-tsc --noEmit && eslint lib/** && jest --coverage && vite build",
     "serve": "vite preview",
     "test": "jest --coverage",
     "lint": "eslint lib/**"
@@ -39,13 +39,18 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.12.11",
+    "@babel/preset-typescript": "^7.14.5",
+    "@types/jest": "^26.0.23",
+    "@typescript-eslint/eslint-plugin": "^4.26.1",
+    "@typescript-eslint/parser": "^4.26.1",
     "@vitejs/plugin-vue": "^1.1.4",
     "@vue/compiler-sfc": "^3.0.5",
     "@vue/test-utils": "2.0.0-rc.0",
     "babel-jest": "^26.6.3",
-    "chart.js": "^3.2.0",
-    "chartjs-plugin-zoom": "^1.0.0-beta.5",
+    "chart.js": "^3.1.0",
+    "chartjs-plugin-zoom": "^1.0.1",
     "coveralls": "^3.1.0",
+    "esbuild": "^0.12.8",
     "eslint": "^7.14.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-import": "^2.22.1",
@@ -55,9 +60,12 @@
     "jest": "^26.6.3",
     "jest-canvas-mock": "^2.3.0",
     "prettier": "2.2.1",
+    "ts-jest": "^27.0.3",
+    "typescript": "^4.3.2",
     "vite": "^2.0.1",
     "vue": "^3.0.5",
-    "vue-jest": "^5.0.0-alpha.8"
+    "vue-jest": "^5.0.0-alpha.9",
+    "vue-tsc": "^0.1.7"
   },
   "babel": {
     "presets": [
@@ -68,6 +76,9 @@
             "node": "current"
           }
         }
+      ],
+      [
+        "@babel/preset-typescript"
       ]
     ]
   }
